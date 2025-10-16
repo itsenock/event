@@ -1,10 +1,10 @@
 import React from "react";
 import type { Event } from "../types/event";
-import { 
-  PencilSquareIcon, 
-  CalendarIcon, 
+import {
+  PencilSquareIcon,
+  CalendarIcon,
   MapPinIcon,
-  EyeIcon
+  EyeIcon,
 } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 
@@ -26,16 +26,16 @@ const EventCard: React.FC<Props> = ({
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(now.getDate() + 1);
-    
+
     if (date.toDateString() === now.toDateString()) {
       return "Today";
     } else if (date.toDateString() === tomorrow.toDateString()) {
       return "Tomorrow";
     } else {
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
       });
     }
   };
@@ -86,7 +86,7 @@ const EventCard: React.FC<Props> = ({
             <CalendarIcon className="h-12 w-12 text-white opacity-80" />
           </div>
         )}
-        
+
         {/* Date Badge */}
         <div className="absolute top-4 left-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 text-center min-w-12">
@@ -94,7 +94,9 @@ const EventCard: React.FC<Props> = ({
               {new Date(event.date).getDate()}
             </div>
             <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">
-              {new Date(event.date).toLocaleString('default', { month: 'short' })}
+              {new Date(event.date).toLocaleString("default", {
+                month: "short",
+              })}
             </div>
           </div>
         </div>
@@ -107,6 +109,7 @@ const EventCard: React.FC<Props> = ({
             e.stopPropagation();
             onEdit();
           }}
+          disabled={isPastEvent}
           className="absolute top-4 right-4 p-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
         >
           <PencilSquareIcon className="h-4 w-4 text-gray-600 dark:text-gray-300 group-hover:text-blue-500 transition-colors" />
@@ -115,30 +118,31 @@ const EventCard: React.FC<Props> = ({
 
       {/* Content */}
       <div className="p-5">
-        {/* Title */}
         <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3 line-clamp-2 leading-tight">
           {event.title}
         </h3>
 
-        {/* Description */}
         {event.description && (
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2 leading-relaxed">
             {event.description}
           </p>
         )}
 
-        {/* Metadata */}
         <div className="space-y-2">
-          {/* Date */}
           <div className="flex items-center gap-2 text-sm">
             <CalendarIcon className="h-4 w-4 text-blue-500 flex-shrink-0" />
-            <span className={`font-medium ${isPastEvent ? "text-gray-500 dark:text-gray-400" : "text-gray-700 dark:text-gray-200"}`}>
+            <span
+              className={`font-medium ${
+                isPastEvent
+                  ? "text-gray-500 dark:text-gray-400"
+                  : "text-gray-700 dark:text-gray-200"
+              }`}
+            >
               {formatDate(event.date)}
               {isPastEvent && " • Past Event"}
             </span>
           </div>
 
-          {/* Venue */}
           <div className="flex items-center gap-2 text-sm">
             <MapPinIcon className="h-4 w-4 text-red-500 flex-shrink-0" />
             <span className="text-gray-600 dark:text-gray-300 line-clamp-1">
@@ -147,21 +151,23 @@ const EventCard: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Status Indicator */}
         <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between">
-            <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-              isPastEvent 
-                ? "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400" 
-                : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
-            }`}>
-              <div className={`w-2 h-2 rounded-full ${
-                isPastEvent ? "bg-gray-400" : "bg-green-500"
-              }`} />
+            <div
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                isPastEvent
+                  ? "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                  : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+              }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  isPastEvent ? "bg-gray-400" : "bg-green-500"
+                }`}
+              />
               {isPastEvent ? "Completed" : "Upcoming"}
             </div>
-            
-            {/* Click Hint */}
+
             <span className="text-xs text-gray-500 dark:text-gray-400">
               Click to view
             </span>
@@ -169,12 +175,13 @@ const EventCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Hover Effect Border */}
-      <div className={`absolute inset-0 rounded-2xl pointer-events-none transition-all duration-300 ${
-        isSelected 
-          ? "ring-2 ring-blue-400" 
-          : "ring-1 ring-transparent group-hover:ring-gray-300 dark:group-hover:ring-gray-600"
-      }`} />
+      <div
+        className={`absolute inset-0 rounded-2xl pointer-events-none transition-all duration-300 ${
+          isSelected
+            ? "ring-2 ring-blue-400"
+            : "ring-1 ring-transparent group-hover:ring-gray-300 dark:group-hover:ring-gray-600"
+        }`}
+      />
     </motion.div>
   );
 };
