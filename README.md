@@ -83,9 +83,9 @@ ESLint + Prettier configured
 
 Modular architecture
 
-Reusable components and hooks
+Reusable components and hooks.
 
-Clean API abstraction
+Clean API abstraction.
 
 Deployment
 You can deploy using:
