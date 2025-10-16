@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useFetchEvents } from "../hooks/useFetchEvents";
 import { useLiveAttendance } from "../hooks/useLiveAttendance";
 import type { Event } from "../types/event";
-import { mockAttendees } from "../data/mockAttendees";
 import AttendanceList from "../components/AttendanceList";
 import CreateEventModal from "../components/CreateEventModal";
 import EditEventModal from "../components/EditEventModal";
@@ -22,146 +21,36 @@ import {
   CalendarIcon,
   ChartBarIcon,
   ArrowTrendingUpIcon,
-  SunIcon,
-  MoonIcon,
-  ComputerDesktopIcon
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
+import type { Dispatch, SetStateAction, FC } from "react";
 
-// // Professional Theme Toggle Component
-// type ThemeMode = 'light' | 'dark' | 'system';
+type HeaderSectionProps = {
+  stats: {
+    totalEvents: number;
+    upcomingEvents: number;
+    pastEvents: number;
+  };
+  viewMode: "grid" | "list";
+  setViewMode: Dispatch<SetStateAction<"grid" | "list">>;
+  setShowMobileAttendance: Dispatch<SetStateAction<boolean>>;
+  filterMonth: string;
+  setFilterMonth: Dispatch<SetStateAction<string>>;
+  filterYear: string;
+  setFilterYear: Dispatch<SetStateAction<string>>;
+};
 
-// const ThemeToggle: React.FC = () => {
-//   const [theme, setTheme] = useState<ThemeMode>(() => {
-//     const saved = localStorage.getItem('theme') as ThemeMode;
-//     if (saved && ['light', 'dark', 'system'].includes(saved)) {
-//       return saved;
-//     }
-//     return 'system';
-//   });
 
-//   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
-
-//   const getSystemTheme = useCallback((): 'light' | 'dark' => {
-//     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-//   }, []);
-
-//   const applyTheme = useCallback((newTheme: ThemeMode) => {
-//     const root = document.documentElement;
-//     const systemTheme = getSystemTheme();
-    
-//     let effectiveTheme: 'light' | 'dark' = systemTheme;
-    
-//     if (newTheme === 'light' || newTheme === 'dark') {
-//       effectiveTheme = newTheme;
-//     }
-
-//     root.classList.remove('light', 'dark');
-//     root.classList.add(effectiveTheme);
-//     root.style.colorScheme = effectiveTheme;
-    
-//     setCurrentTheme(effectiveTheme);
-//     localStorage.setItem('theme', newTheme);
-//   }, [getSystemTheme]);
-
-//   useEffect(() => {
-//     applyTheme(theme);
-//   }, [theme, applyTheme]);
-
-//   useEffect(() => {
-//     if (theme !== 'system') return;
-
-//     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-//     const handleChange = () => applyTheme('system');
-    
-//     mediaQuery.addEventListener('change', handleChange);
-//     return () => mediaQuery.removeEventListener('change', handleChange);
-//   }, [theme, applyTheme]);
-
-//   const toggleTheme = useCallback(() => {
-//     const themes: ThemeMode[] = ['light', 'dark', 'system'];
-//     const currentIndex = themes.indexOf(theme);
-//     const nextIndex = (currentIndex + 1) % themes.length;
-//     setTheme(themes[nextIndex]);
-//   }, [theme]);
-
-//   const getThemeLabel = () => {
-//     const labels = {
-//       light: 'Light theme',
-//       dark: 'Dark theme',
-//       system: 'System theme',
-//     };
-//     return labels[theme];
-//   };
-
-//   const renderIcon = () => {
-//     if (theme === 'system') {
-//       return <ComputerDesktopIcon className="h-5 w-5" />;
-//     }
-    
-//     return currentTheme === 'dark' ? (
-//       <MoonIcon className="h-5 w-5" />
-//     ) : (
-//       <SunIcon className="h-5 w-5" />
-//     );
-//   };
-
-//   return (
-//     <motion.button
-//       whileHover={{ scale: 1.05 }}
-//       whileTap={{ scale: 0.95 }}
-//       onClick={toggleTheme}
-//       className={`
-//         p-3
-//         bg-white dark:bg-gray-800 
-//         text-gray-900 dark:text-white 
-//         rounded-2xl shadow-lg 
-//         border border-gray-200 dark:border-gray-700
-//         hover:shadow-xl
-//         transition-all duration-200 
-//         z-40
-//         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900
-//         group
-//       `}
-//       aria-label={`Toggle theme. Current: ${getThemeLabel()}`}
-//       title={getThemeLabel()}
-//     >
-//       {renderIcon()}
-      
-//       {/* Tooltip */}
-//       <div className="
-//         absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2
-//         px-3 py-2 text-sm font-medium
-//         bg-gray-900 dark:bg-white 
-//         text-white dark:text-gray-900 
-//         rounded-xl opacity-0 group-hover:opacity-100 
-//         transition-opacity duration-200
-//         pointer-events-none
-//         whitespace-nowrap
-//         shadow-lg
-//       ">
-//         {getThemeLabel()}
-//         {theme === 'system' && (
-//           <div className="text-xs opacity-75 mt-1">
-//             ({currentTheme})
-//           </div>
-//         )}
-//       </div>
-//     </motion.button>
-//   );
-// };
-
-// Enhanced Header Component
-const HeaderSection = ({ 
-  stats, 
-  viewMode, 
-  setViewMode, 
+const HeaderSection: FC<HeaderSectionProps> = ({
+  stats,
+  viewMode,
+  setViewMode,
   setShowMobileAttendance,
   filterMonth,
   setFilterMonth,
   filterYear,
-  setFilterYear 
+  setFilterYear,
 }) => (
   <motion.div
     initial={{ opacity: 0, y: -20 }}
@@ -445,10 +334,8 @@ const EventsPage: React.FC = () => {
   const { attendees: liveAttendees } = useLiveAttendance(
     selectedEvent?.id || null
   );
-  const attendees = [
-    ...mockAttendees.filter((a) => a.eventId === selectedEvent?.id),
-    ...liveAttendees,
-  ];
+  const attendees = liveAttendees;
+
 
   const getEventStats = () => {
     const totalEvents = events.length;

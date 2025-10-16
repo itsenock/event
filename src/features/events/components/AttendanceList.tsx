@@ -12,7 +12,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
-import axios from "axios";
+import { getAttendance } from "../api/useAttendance";
 
 type Props = {
   attendees?: Attendee[];
@@ -26,8 +26,8 @@ const AttendanceList: React.FC<Props> = ({ attendees: initialAttendees = [], eve
   useEffect(() => {
     const fetchAttendees = async () => {
       try {
-        const res = await axios.get(`https://your-backend-url.com/events/${eventId}/attendance`);
-        setAttendees(res.data);
+        const data = await getAttendance(eventId);
+        setAttendees(data);
       } catch (error) {
         console.error("Failed to fetch attendees:", error);
       }
