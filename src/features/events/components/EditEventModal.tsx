@@ -67,10 +67,10 @@ const EditEventModal: React.FC<Props> = ({ event, onClose, onUpdate }) => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700"
+          className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] flex flex-col" // Changed to flex-col and max-h-[95vh]
         >
-          {/* Header */}
-          <div className="relative bg-gradient-to-r from-amber-500 to-orange-600 p-6">
+          {/* Header - Fixed */}
+          <div className="relative bg-gradient-to-r from-amber-500 to-orange-600 p-6 flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
@@ -90,8 +90,8 @@ const EditEventModal: React.FC<Props> = ({ event, onClose, onUpdate }) => {
             </div>
           </div>
 
-          {/* Form Content */}
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+          {/* Form Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left Column - Basic Info */}
               <div className="space-y-5">
@@ -204,14 +204,14 @@ const EditEventModal: React.FC<Props> = ({ event, onClose, onUpdate }) => {
                   <img
                     src={preview || posterUrl}
                     alt="Poster Preview"
-                    className="w-full h-48 object-cover rounded-xl border-2 border-gray-200 dark:border-gray-600 shadow-sm group-hover:shadow-md transition-all duration-200"
+                    className="w-full h-32 sm:h-48 object-cover rounded-xl border-2 border-gray-200 dark:border-gray-600 shadow-sm group-hover:shadow-md transition-all duration-200"
                   />
                   <button
                     onClick={() => {
                       setPreview(null)
                       setPosterUrl("")
                     }}
-                    className="absolute top-3 right-3 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600"
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-70 hover:opacity-100 transition-opacity duration-200 hover:bg-red-600"
                   >
                     <XMarkIcon className="h-4 w-4" />
                   </button>
@@ -220,18 +220,18 @@ const EditEventModal: React.FC<Props> = ({ event, onClose, onUpdate }) => {
             )}
           </div>
 
-          {/* Footer Actions */}
-          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
+          {/* Footer Actions - Fixed at bottom */}
+          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 * Required fields
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-3 w-full sm:w-auto">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={onClose}
-                  className="px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 font-medium"
+                  className="px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 font-medium flex-1 sm:flex-none text-center"
                 >
                   Cancel
                 </motion.button>
@@ -240,7 +240,7 @@ const EditEventModal: React.FC<Props> = ({ event, onClose, onUpdate }) => {
                   whileTap={{ scale: isFormValid ? 0.98 : 1 }}
                   onClick={handleUpdate}
                   disabled={!isFormValid}
-                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex-1 sm:flex-none text-center ${
                     isFormValid
                       ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-orange-700"
                       : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"

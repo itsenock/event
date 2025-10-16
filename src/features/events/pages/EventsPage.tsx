@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useFetchEvents } from "../hooks/useFetchEvents";
 import { useLiveAttendance } from "../hooks/useLiveAttendance";
 import type { Event } from "../types/event";
@@ -20,9 +20,394 @@ import {
   PlusIcon,
   FunnelIcon,
   CalendarIcon,
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  SunIcon,
+  MoonIcon,
+  ComputerDesktopIcon
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
+
+// // Professional Theme Toggle Component
+// type ThemeMode = 'light' | 'dark' | 'system';
+
+// const ThemeToggle: React.FC = () => {
+//   const [theme, setTheme] = useState<ThemeMode>(() => {
+//     const saved = localStorage.getItem('theme') as ThemeMode;
+//     if (saved && ['light', 'dark', 'system'].includes(saved)) {
+//       return saved;
+//     }
+//     return 'system';
+//   });
+
+//   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
+
+//   const getSystemTheme = useCallback((): 'light' | 'dark' => {
+//     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+//   }, []);
+
+//   const applyTheme = useCallback((newTheme: ThemeMode) => {
+//     const root = document.documentElement;
+//     const systemTheme = getSystemTheme();
+    
+//     let effectiveTheme: 'light' | 'dark' = systemTheme;
+    
+//     if (newTheme === 'light' || newTheme === 'dark') {
+//       effectiveTheme = newTheme;
+//     }
+
+//     root.classList.remove('light', 'dark');
+//     root.classList.add(effectiveTheme);
+//     root.style.colorScheme = effectiveTheme;
+    
+//     setCurrentTheme(effectiveTheme);
+//     localStorage.setItem('theme', newTheme);
+//   }, [getSystemTheme]);
+
+//   useEffect(() => {
+//     applyTheme(theme);
+//   }, [theme, applyTheme]);
+
+//   useEffect(() => {
+//     if (theme !== 'system') return;
+
+//     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+//     const handleChange = () => applyTheme('system');
+    
+//     mediaQuery.addEventListener('change', handleChange);
+//     return () => mediaQuery.removeEventListener('change', handleChange);
+//   }, [theme, applyTheme]);
+
+//   const toggleTheme = useCallback(() => {
+//     const themes: ThemeMode[] = ['light', 'dark', 'system'];
+//     const currentIndex = themes.indexOf(theme);
+//     const nextIndex = (currentIndex + 1) % themes.length;
+//     setTheme(themes[nextIndex]);
+//   }, [theme]);
+
+//   const getThemeLabel = () => {
+//     const labels = {
+//       light: 'Light theme',
+//       dark: 'Dark theme',
+//       system: 'System theme',
+//     };
+//     return labels[theme];
+//   };
+
+//   const renderIcon = () => {
+//     if (theme === 'system') {
+//       return <ComputerDesktopIcon className="h-5 w-5" />;
+//     }
+    
+//     return currentTheme === 'dark' ? (
+//       <MoonIcon className="h-5 w-5" />
+//     ) : (
+//       <SunIcon className="h-5 w-5" />
+//     );
+//   };
+
+//   return (
+//     <motion.button
+//       whileHover={{ scale: 1.05 }}
+//       whileTap={{ scale: 0.95 }}
+//       onClick={toggleTheme}
+//       className={`
+//         p-3
+//         bg-white dark:bg-gray-800 
+//         text-gray-900 dark:text-white 
+//         rounded-2xl shadow-lg 
+//         border border-gray-200 dark:border-gray-700
+//         hover:shadow-xl
+//         transition-all duration-200 
+//         z-40
+//         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900
+//         group
+//       `}
+//       aria-label={`Toggle theme. Current: ${getThemeLabel()}`}
+//       title={getThemeLabel()}
+//     >
+//       {renderIcon()}
+      
+//       {/* Tooltip */}
+//       <div className="
+//         absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2
+//         px-3 py-2 text-sm font-medium
+//         bg-gray-900 dark:bg-white 
+//         text-white dark:text-gray-900 
+//         rounded-xl opacity-0 group-hover:opacity-100 
+//         transition-opacity duration-200
+//         pointer-events-none
+//         whitespace-nowrap
+//         shadow-lg
+//       ">
+//         {getThemeLabel()}
+//         {theme === 'system' && (
+//           <div className="text-xs opacity-75 mt-1">
+//             ({currentTheme})
+//           </div>
+//         )}
+//       </div>
+//     </motion.button>
+//   );
+// };
+
+// Enhanced Header Component
+const HeaderSection = ({ 
+  stats, 
+  viewMode, 
+  setViewMode, 
+  setShowMobileAttendance,
+  filterMonth,
+  setFilterMonth,
+  filterYear,
+  setFilterYear 
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="w-full max-w-[1920px] mx-auto mb-8"
+  >
+    {/* Top Controls Bar */}
+    <div className="flex justify-between items-center mb-6">
+      {/* Left side - Theme Toggle */}
+      {/* <div className=" items-center gap-3">
+        <ThemeToggle />
+      </div> */}
+
+      {/* Right side - Additional controls can be added here */}
+      <div className="flex items-center gap-3">
+        {/* Placeholder for future controls */}
+      </div>
+    </div>
+
+    {/* Main Header Container */}
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-6">
+      
+      {/* Left Section - Title and Stats */}
+      <div className="flex-1 flex flex-col gap-4">
+        
+        {/* Title Section */}
+        <div className="flex items-start gap-4">
+          {/* Icon */}
+          <div className="p-3 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 rounded-2xl shadow-2xl flex-shrink-0">
+            <CalendarIcon className="h-7 w-7 text-white" />
+          </div>
+          
+          {/* Title and Description */}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-2 sm:gap-4 mb-2">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white leading-tight">
+                Event Management
+              </h1>
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <ArrowTrendingUpIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                    {stats.totalEvents} Events
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced Stats Cards */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Total Events */}
+          <motion.div 
+            whileHover={{ scale: 1.02, y: -2 }}
+            className="flex-1 min-w-[160px] bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl p-4 shadow-lg border border-blue-200 dark:border-blue-700/50"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl lg:text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  {stats.totalEvents}
+                </div>
+                <div className="text-sm font-medium text-blue-700 dark:text-blue-300 mt-1">
+                  Total Events
+                </div>
+              </div>
+              <div className="p-2 bg-blue-500/10 rounded-xl">
+                <CalendarIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Upcoming Events */}
+          <motion.div 
+            whileHover={{ scale: 1.02, y: -2 }}
+            className="flex-1 min-w-[160px] bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-800/20 rounded-2xl p-4 shadow-lg border border-green-200 dark:border-green-700/50"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl lg:text-3xl font-bold text-green-600 dark:text-green-400">
+                  {stats.upcomingEvents}
+                </div>
+                <div className="text-sm font-medium text-green-700 dark:text-green-300 mt-1">
+                  Upcoming
+                </div>
+              </div>
+              <div className="p-2 bg-green-500/10 rounded-xl">
+                <PlusIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Completed Events */}
+          <motion.div 
+            whileHover={{ scale: 1.02, y: -2 }}
+            className="flex-1 min-w-[160px] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/20 dark:to-gray-700/20 rounded-2xl p-4 shadow-lg border border-gray-200 dark:border-gray-600/50"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl lg:text-3xl font-bold text-gray-600 dark:text-gray-400">
+                  {stats.pastEvents}
+                </div>
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">
+                  Completed
+                </div>
+              </div>
+              <div className="p-2 bg-gray-500/10 rounded-xl">
+                <ChartBarIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Right Section - Controls */}
+      <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch gap-4 flex-shrink-0">
+        
+        {/* View Toggle */}
+        <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-2xl p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setViewMode("grid")}
+            className={`p-3 rounded-xl transition-all duration-200 flex items-center justify-center ${
+              viewMode === "grid"
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+                : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            }`}
+          >
+            <Squares2X2Icon className="h-5 w-5" />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setViewMode("list")}
+            className={`p-3 rounded-xl transition-all duration-200 flex items-center justify-center ${
+              viewMode === "list"
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+                : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            }`}
+          >
+            <ListBulletIcon className="h-5 w-5" />
+          </motion.button>
+        </div>
+
+        {/* Mobile Attendance Button */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setShowMobileAttendance(true)}
+          className="lg:hidden p-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3 flex-1 sm:flex-none"
+        >
+          <UserGroupIcon className="h-5 w-5" />
+          <span className="font-semibold">View Attendance</span>
+        </motion.button>
+      </div>
+    </div>
+
+    {/* Enhanced Filter Section */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.2 }}
+      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 dark:border-gray-700/50"
+    >
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        
+        {/* Filter Title */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <FunnelIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h3 className="font-bold text-gray-800 dark:text-white text-lg">
+              Filter Events
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Narrow down your event list
+            </p>
+          </div>
+        </div>
+        
+        {/* Filter Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch gap-4 w-full lg:w-auto">
+          
+          {/* Month Filter */}
+          <div className="flex flex-col gap-2 flex-1 sm:flex-none sm:min-w-[180px]">
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4" />
+              Month
+            </label>
+            <select
+              value={filterMonth}
+              onChange={(e) => setFilterMonth(e.target.value)}
+              className="px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+            >
+              <option value="">All Months</option>
+              {[
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ].map((month, index) => (
+                <option key={month} value={index.toString()}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Year Filter */}
+          <div className="flex flex-col gap-2 flex-1 sm:flex-none sm:min-w-[140px]">
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Year
+            </label>
+            <select
+              value={filterYear}
+              onChange={(e) => setFilterYear(e.target.value)}
+              className="px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+            >
+              <option value="">All Years</option>
+              {[2023, 2024, 2025, 2026, 2027].map((year) => (
+                <option key={year} value={year.toString()}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Clear Filters Button */}
+          <div className="flex items-end">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                setFilterMonth("");
+                setFilterYear("");
+              }}
+              className="px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 font-medium shadow-sm"
+            >
+              Clear
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  </motion.div>
+);
 
 const EventsPage: React.FC = () => {
   const { events, loading, motionKey } = useFetchEvents();
@@ -79,157 +464,23 @@ const EventsPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-4 lg:p-6">
       <Toaster position="top-right" />
 
-      {/* Header Section with Improved Flexbox */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[1920px] mx-auto mb-8"
-      >
-        {/* Main Header Row */}
-        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
-          {/* Title and Stats Section */}
-          <div className="flex-1 w-full">
-            <div className="flex items-start sm:items-center gap-4 mb-4 flex-col sm:flex-row">
-              <div className="flex items-center gap-3 flex-shrink-0">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg flex-shrink-0">
-                  <CalendarIcon className="h-6 w-6 text-white" />
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
-                    Event Management
-                  </h1>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-                    Create, manage, and track events
-                  </p>
-                </div>
-              </div>
-            </div>
+      {/* Enhanced Header Section with Theme Toggle */}
+      <HeaderSection
+        stats={stats}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        setShowMobileAttendance={setShowMobileAttendance}
+        filterMonth={filterMonth}
+        setFilterMonth={setFilterMonth}
+        filterYear={filterYear}
+        setFilterYear={setFilterYear}
+      />
 
-            {/* Stats Cards with Flexbox Wrap */}
-            <div className="flex flex-wrap gap-3">
-              <div className="flex-1 min-w-[140px] max-w-[200px] bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  {stats.totalEvents}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Total Events</div>
-              </div>
-              <div className="flex-1 min-w-[140px] max-w-[200px] bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {stats.upcomingEvents}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Upcoming</div>
-              </div>
-              <div className="flex-1 min-w-[140px] max-w-[200px] bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
-                <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
-                  {stats.pastEvents}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Completed</div>
-              </div>
-            </div>
-          </div>
-
-          {/* View Controls - Better Flex Arrangement */}
-          <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-3 w-full xs:w-auto">
-            <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-xl p-2 shadow-lg border border-gray-200 dark:border-gray-700 flex-shrink-0">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-lg transition-all duration-200 flex items-center justify-center ${
-                  viewMode === "grid"
-                    ? "bg-blue-500 text-white shadow-md"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-              >
-                <Squares2X2Icon className="h-5 w-5" />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setViewMode("list")}
-                className={`p-2 rounded-lg transition-all duration-200 flex items-center justify-center ${
-                  viewMode === "list"
-                    ? "bg-blue-500 text-white shadow-md"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-              >
-                <ListBulletIcon className="h-5 w-5" />
-              </motion.button>
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowMobileAttendance(true)}
-              className="lg:hidden p-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 flex-1 xs:flex-none"
-            >
-              <UserGroupIcon className="h-5 w-5" />
-              <span className="font-medium">Attendance</span>
-            </motion.button>
-          </div>
-        </div>
-
-        {/* Filters with Improved Flexbox */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200 dark:border-gray-700"
-        >
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <FunnelIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              <span className="font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                Filter Events
-              </span>
-            </div>
-            
-            {/* Filter Controls with Flexible Layout */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 w-full lg:w-auto">
-              <div className="flex flex-col gap-1 flex-1 min-w-[150px]">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Month</label>
-                <select
-                  value={filterMonth}
-                  onChange={(e) => setFilterMonth(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                >
-                  <option value="">All Months</option>
-                  {[
-                    "January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"
-                  ].map((month, index) => (
-                    <option key={month} value={index.toString()}>
-                      {month}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Year</label>
-                <select
-                  value={filterYear}
-                  onChange={(e) => setFilterYear(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                >
-                  <option value="">All Years</option>
-                  {[2023, 2024, 2025, 2026, 2027].map((year) => (
-                    <option key={year} value={year.toString()}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Main Content with Improved Flexbox */}
+      {/* Main Content */}
       <div className="w-full max-w-[1920px] mx-auto">
         <div className="flex flex-col xl:flex-row gap-6 items-stretch">
           {/* Events Section - Flexible Width */}
-          <div className="flex-1 min-w-0"> {/* min-w-0 prevents flex overflow */}
+          <div className="flex-1 min-w-0">
             {loading ? (
               <div className="flex justify-center items-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -283,7 +534,7 @@ const EventsPage: React.FC = () => {
               </AnimatePresence>
             )}
 
-            {/* Pagination with Better Flexbox */}
+            {/* Pagination */}
             {filteredEvents.length > 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -403,7 +654,7 @@ const EventsPage: React.FC = () => {
         />
       )}
 
-      {/* Mobile Attendance Drawer with Better Flexbox */}
+      {/* Mobile Attendance Drawer */}
       <AnimatePresence>
         {showMobileAttendance && selectedEvent && (
           <motion.div
