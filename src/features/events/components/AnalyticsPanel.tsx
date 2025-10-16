@@ -14,12 +14,12 @@ import {
 import { Bar, Line, Pie } from "react-chartjs-2";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { 
-  ChartBarIcon, 
+import {
+  ChartBarIcon,
   ArrowDownTrayIcon,
   ChartPieIcon,
   ChartBarSquareIcon,
-  EyeIcon
+  EyeIcon,
 } from "@heroicons/react/24/outline";
 import type { Attendee, Event } from "../types/event";
 import { motion } from "framer-motion";
@@ -95,7 +95,12 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
       datasets: [
         {
           label: "Present",
-          data: [Math.floor(counts.Present * 0.3), Math.floor(counts.Present * 0.6), Math.floor(counts.Present * 0.8), counts.Present],
+          data: [
+            Math.floor(counts.Present * 0.3),
+            Math.floor(counts.Present * 0.6),
+            Math.floor(counts.Present * 0.8),
+            counts.Present,
+          ],
           borderColor: "#10b981",
           backgroundColor: "rgba(16, 185, 129, 0.1)",
           tension: 0.4,
@@ -107,7 +112,12 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
         },
         {
           label: "Late",
-          data: [Math.floor(counts.Late * 0.3), Math.floor(counts.Late * 0.6), Math.floor(counts.Late * 0.8), counts.Late],
+          data: [
+            Math.floor(counts.Late * 0.3),
+            Math.floor(counts.Late * 0.6),
+            Math.floor(counts.Late * 0.8),
+            counts.Late,
+          ],
           borderColor: "#f59e0b",
           backgroundColor: "rgba(245, 158, 11, 0.1)",
           tension: 0.4,
@@ -119,7 +129,12 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
         },
         {
           label: "Absent",
-          data: [Math.floor(counts.Absent * 0.3), Math.floor(counts.Absent * 0.6), Math.floor(counts.Absent * 0.8), counts.Absent],
+          data: [
+            Math.floor(counts.Absent * 0.3),
+            Math.floor(counts.Absent * 0.6),
+            Math.floor(counts.Absent * 0.8),
+            counts.Absent,
+          ],
           borderColor: "#ef4444",
           backgroundColor: "rgba(239, 68, 68, 0.1)",
           tension: 0.4,
@@ -137,33 +152,37 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { 
+      legend: {
         display: true,
-        position: 'top' as const,
+        position: "top" as const,
         labels: {
           usePointStyle: true,
           padding: 20,
           font: {
             size: 12,
-            weight: '600' as const,
-          }
-        }
+            weight: "600" as const,
+          },
+        },
       },
       tooltip: {
         enabled: true,
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        titleColor: '#1f2937',
-        bodyColor: '#374151',
-        borderColor: '#e5e7eb',
+        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        titleColor: "#1f2937",
+        bodyColor: "#374151",
+        borderColor: "#e5e7eb",
         borderWidth: 1,
         cornerRadius: 8,
         displayColors: true,
         callbacks: {
           label: function (context: any) {
-            const label = context.dataset.label || '';
+            const label = context.dataset.label || "";
             const value = context.raw;
-            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+            const total = context.dataset.data.reduce(
+              (a: number, b: number) => a + b,
+              0
+            );
+            const percentage =
+              total > 0 ? ((value / total) * 100).toFixed(1) : "0";
             return `${label}: ${value} (${percentage}%)`;
           },
         },
@@ -180,30 +199,30 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
     scales: {
       x: {
         type: "category" as const,
-        grid: { 
+        grid: {
           display: false,
-          color: 'rgba(0, 0, 0, 0.1)'
+          color: "rgba(0, 0, 0, 0.1)",
         },
-        ticks: { 
+        ticks: {
           color: "#6b7280",
           font: {
             size: 12,
-            weight: '600' as const,
-          }
+            weight: "600" as const,
+          },
         },
       },
       y: {
         type: "linear" as const,
         beginAtZero: true,
-        grid: { 
+        grid: {
           color: "rgba(0, 0, 0, 0.05)",
         },
-        ticks: { 
-          stepSize: 1, 
+        ticks: {
+          stepSize: 1,
           color: "#6b7280",
           font: {
             size: 11,
-          }
+          },
         },
       },
     },
@@ -217,7 +236,7 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
 
   const pieOptions = {
     ...commonOptions,
-    cutout: '0%',
+    cutout: "0%",
     animation: {
       ...commonOptions.animation,
       animateRotate: true,
@@ -281,7 +300,7 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
             </p>
           </div>
         </div>
-        
+
         <div className="flex flex-wrap gap-2">
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -305,7 +324,7 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
       </div>
 
       {/* Controls */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-8">
         <div className="space-y-2">
           <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
             <EyeIcon className="h-4 w-4" />
@@ -330,7 +349,7 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
             Chart Type
           </label>
           <div className="flex gap-2">
-            {(['bar', 'line', 'pie'] as const).map((type) => {
+            {(["bar", "line", "pie"] as const).map((type) => {
               const Icon = chartIcons[type];
               return (
                 <motion.button
@@ -338,10 +357,10 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setChartType(type)}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all ${
+                  className={`w-[60px] flex items-center justify-center gap-1 px-3 py-2 rounded-xl border transition-all ${
                     chartType === type
-                      ? 'bg-blue-500 text-white border-blue-500 shadow-lg'
-                      : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                      ? "bg-blue-500 text-white border-blue-500 shadow-lg"
+                      : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -362,15 +381,25 @@ const AnalyticsPanel: React.FC<Props> = ({ attendees, events }) => {
         ref={chartRef}
         className="h-80 mb-8 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-inner border border-gray-100 dark:border-gray-700"
       >
-        {chartType === "bar" && <Bar data={chartData.bar} options={barOptions} />}
-        {chartType === "line" && <Line data={chartData.line} options={lineOptions} />}
-        {chartType === "pie" && <Pie data={chartData.pie} options={pieOptions} />}
+        {chartType === "bar" && (
+          <Bar data={chartData.bar} options={barOptions} />
+        )}
+        {chartType === "line" && (
+          <Line data={chartData.line} options={lineOptions} />
+        )}
+        {chartType === "pie" && (
+          <Pie data={chartData.pie} options={pieOptions} />
+        )}
       </motion.div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: "Total Present", value: totalSummary.Present, color: "green" },
+          {
+            label: "Total Present",
+            value: totalSummary.Present,
+            color: "green",
+          },
           { label: "Total Late", value: totalSummary.Late, color: "yellow" },
           { label: "Total Absent", value: totalSummary.Absent, color: "red" },
         ].map((item, index) => (

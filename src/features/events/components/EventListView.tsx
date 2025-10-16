@@ -1,12 +1,10 @@
 import React from "react";
 import type { Event } from "../types/event";
-import { 
-  PencilSquareIcon, 
-  CalendarIcon, 
+import {
+  PencilSquareIcon,
+  CalendarIcon,
   MapPinIcon,
-  DocumentTextIcon,
   EyeIcon,
-  ClockIcon
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -28,23 +26,29 @@ const EventListView: React.FC<Props> = ({
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(now.getDate() + 1);
-    
+
     if (date.toDateString() === now.toDateString()) {
       return { text: "Today", color: "text-green-600" };
     } else if (date.toDateString() === tomorrow.toDateString()) {
       return { text: "Tomorrow", color: "text-blue-600" };
     } else if (date < now) {
-      return { text: date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
-      }), color: "text-gray-500" };
+      return {
+        text: date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+        color: "text-gray-500",
+      };
     } else {
-      return { text: date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
-      }), color: "text-gray-700 dark:text-gray-300" };
+      return {
+        text: date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+        color: "text-gray-700 dark:text-gray-300",
+      };
     }
   };
 
@@ -100,7 +104,7 @@ const EventListView: React.FC<Props> = ({
                       <CalendarIcon className="h-8 w-8 text-white opacity-90" />
                     </div>
                   )}
-                  
+
                   {/* Past Event Overlay */}
                   {isPast && (
                     <div className="absolute inset-0 bg-gray-900 bg-opacity-40 rounded-xl" />
@@ -111,14 +115,16 @@ const EventListView: React.FC<Props> = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-2">
                     <div className="min-w-0">
-                      <h3 className={`text-lg font-bold truncate ${
-                        isPast 
-                          ? "text-gray-500 dark:text-gray-400" 
-                          : "text-gray-800 dark:text-white"
-                      }`}>
+                      <h3
+                        className={`text-lg font-bold truncate ${
+                          isPast
+                            ? "text-gray-500 dark:text-gray-400"
+                            : "text-gray-800 dark:text-white"
+                        }`}
+                      >
                         {event.title}
                       </h3>
-                      
+
                       {/* Description */}
                       {event.description && (
                         <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2 leading-relaxed">
@@ -132,9 +138,11 @@ const EventListView: React.FC<Props> = ({
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm">
                     {/* Date */}
                     <div className="flex items-center gap-2">
-                      <CalendarIcon className={`h-4 w-4 ${
-                        isPast ? "text-gray-400" : "text-blue-500"
-                      }`} />
+                      <CalendarIcon
+                        className={`h-4 w-4 ${
+                          isPast ? "text-gray-400" : "text-blue-500"
+                        }`}
+                      />
                       <span className={`font-medium ${dateInfo.color}`}>
                         {dateInfo.text}
                       </span>
@@ -149,14 +157,18 @@ const EventListView: React.FC<Props> = ({
                     </div>
 
                     {/* Status Badge */}
-                    <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                      isPast 
-                        ? "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400" 
-                        : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
-                    }`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${
-                        isPast ? "bg-gray-400" : "bg-green-500"
-                      }`} />
+                    <div
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                        isPast
+                          ? "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                          : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                      }`}
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          isPast ? "bg-gray-400" : "bg-green-500"
+                        }`}
+                      />
                       {isPast ? "Completed" : "Upcoming"}
                     </div>
                   </div>
@@ -170,6 +182,7 @@ const EventListView: React.FC<Props> = ({
                     e.stopPropagation();
                     onEdit(event);
                   }}
+                  disabled={isPast}
                   className="flex-shrink-0 p-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:from-amber-600 hover:to-orange-600 shadow-md hover:shadow-lg transition-all duration-200 group/edit"
                   title="Edit Event"
                 >

@@ -1,43 +1,63 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import type { Attendee } from "../types/event";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { CSVLink } from "react-csv";
-import { 
-  DocumentArrowDownIcon, 
+import {
+  DocumentArrowDownIcon,
   TableCellsIcon,
   UserGroupIcon,
   CheckCircleIcon,
   ClockIcon,
-  XCircleIcon
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 type Props = {
-  attendees: Attendee[];
+  attendees?: Attendee[];
   eventId: string;
   eventTitle: string;
 };
 
-const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
+const AttendanceList: React.FC<Props> = ({ attendees: initialAttendees = [], eventId, eventTitle }) => {
+  const [attendees, setAttendees] = useState<Attendee[]>(initialAttendees);
+
+  useEffect(() => {
+    const fetchAttendees = async () => {
+      try {
+        const res = await axios.get(`https://your-backend-url.com/events/${eventId}/attendance`);
+        setAttendees(res.data);
+      } catch (error) {
+        console.error("Failed to fetch attendees:", error);
+      }
+    };
+
+    if (eventId) {
+      fetchAttendees();
+    }
+  }, [eventId]);
+
   const generatePDF = () => {
     const doc = new jsPDF();
-    
-    // Add header with styling
+
     doc.setFillColor(59, 130, 246);
-    doc.rect(0, 0, 220, 30, 'F');
+    doc.rect(0, 0, 220, 30, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text(`Attendance Report - ${eventTitle}`, 14, 20);
-    
-    // Reset text color for table
+
     doc.setTextColor(0, 0, 0);
-    
+
     doc.autoTable({
       startY: 35,
       head: [["Name", "Status", "Timestamp"]],
-      body: attendees.map((a) => [a.name, a.status, a.timestamp || new Date().toLocaleDateString()]),
+      body: attendees.map((a) => [
+        a.name,
+        a.status,
+        a.timestamp || new Date().toLocaleDateString(),
+      ]),
       styles: {
         fontSize: 10,
         cellPadding: 3,
@@ -45,14 +65,14 @@ const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
       headStyles: {
         fillColor: [79, 70, 229],
         textColor: 255,
-        fontStyle: 'bold'
+        fontStyle: "bold",
       },
       alternateRowStyles: {
-        fillColor: [240, 240, 240]
-      }
+        fillColor: [240, 240, 240],
+      },
     });
-    
-    doc.save(`attendance-${eventTitle.replace(/\s+/g, '-')}.pdf`);
+
+    doc.save(`attendance-${eventTitle.replace(/\s+/g, "-")}.pdf`);
   };
 
   const getStatusIcon = (status: string) => {
@@ -84,7 +104,6 @@ const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
       transition={{ duration: 0.5 }}
       className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-xl rounded-2xl p-6 border border-gray-100 dark:border-gray-700"
     >
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
@@ -99,8 +118,7 @@ const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
             </p>
           </div>
         </div>
-        
-        {/* Summary Badges */}
+
         <div className="flex gap-3">
           <div className="flex items-center gap-1 px-3 py-1 bg-green-50 dark:bg-green-900/20 rounded-full">
             <CheckCircleIcon className="h-3 w-3 text-green-600" />
@@ -123,7 +141,6 @@ const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
         </div>
       </div>
 
-      {/* Attendance List */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-inner border border-gray-200 dark:border-gray-600 overflow-hidden mb-6">
         <div className="max-h-80 overflow-y-auto">
           <table className="w-full">
@@ -150,7 +167,11 @@ const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
                     <div className="flex items-center gap-3">
                       <div className="flex-shrink-0">
                         <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                          {attendee.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          {attendee.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()}
                         </div>
                       </div>
                       <div>
@@ -165,13 +186,15 @@ const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
-                        attendee.status === "Present"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                          : attendee.status === "Late"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
-                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                      }`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+                          attendee.status === "Present"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                            : attendee.status === "Late"
+                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                            : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                        }`}
+                      >
                         {getStatusIcon(attendee.status)}
                         {attendee.status}
                       </span>
@@ -181,22 +204,23 @@ const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
               ))}
             </tbody>
           </table>
-          
+
           {attendees.length === 0 && (
             <div className="text-center py-12">
               <UserGroupIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 text-sm">No attendees found</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                No attendees found
+              </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Export Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
+            <div className="flex flex-col sm:flex-row gap-3 justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Total {attendees.length} attendees
         </p>
-        
+
         <div className="flex gap-3">
           <CSVLink
             data={attendees}
@@ -206,7 +230,7 @@ const AttendanceList: React.FC<Props> = ({ attendees, eventTitle }) => {
             <TableCellsIcon className="h-4 w-4" />
             Export CSV
           </CSVLink>
-          
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
