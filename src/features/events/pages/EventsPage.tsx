@@ -8,7 +8,7 @@ import EditEventModal from "../components/EditEventModal";
 import EventCard from "../components/EventCard";
 import EventListView from "../components/EventListView";
 import AnalyticsPanel from "../components/AnalyticsPanel";
-import FloatingButton from "../../components/FloatingButton";
+import FloatingButton from "../global_components/FloatingButton";
 import {
   Squares2X2Icon,
   ListBulletIcon,
