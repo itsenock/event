@@ -12,5 +12,6 @@ export const updateEvent = async (event: Event): Promise<void> => {
   } catch (error) {
     // Re-throw with a clean message (Axios errors include extra noise)
     throw new Error("Failed to update event");
+    console.log(error);
   }
 };

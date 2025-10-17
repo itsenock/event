@@ -24,7 +24,7 @@ export const useFetchEvents = () => {
 
     fetch();
 
-    const socket = new WebSocket("ws://localhost:5000");
+    const socket = new WebSocket("ws://cislu-web-app-backend.onrender.com/events/ws");
     socket.onmessage = msg => {
       try {
         const updated = JSON.parse(msg.data);
